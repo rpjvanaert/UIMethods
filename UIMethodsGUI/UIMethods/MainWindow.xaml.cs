@@ -64,7 +64,12 @@ namespace UIMethods
             logline.Text = logline.Text + enterStr + regex.Concatenated;
             regex.ShuntingYardPostfix();
             logline.Text = logline.Text + enterStr + regex.Postfix;
-
+            Automaton<string> automaton = regex.ConstructThompson();
+            logline.Text = logline.Text + enterStr + automaton.ToString();
+            foreach (Transition<string> transition in automaton.GetTransitions())
+            {
+                logline.Text = logline.Text + enterStr + transition.ToString();
+            }
         }
 
         private void TestBtn_Click(object sender, RoutedEventArgs e)

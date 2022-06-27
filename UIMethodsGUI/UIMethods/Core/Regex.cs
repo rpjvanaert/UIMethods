@@ -118,5 +118,106 @@ namespace UIMethods.Core
             }
         }
 
+        public Automaton<string> ConstructThompson()
+        {
+            Stack<Automaton<string>> nfaStack = new Stack<Automaton<string>>();
+
+            StateNamer stateNamer = new StateNamer('s');
+
+            foreach (char c in this.Postfix)
+            {
+
+                if (Char.IsLetter(c))
+                {
+                    nfaStack.Push(this.ConstructSymbol(c));
+                    
+                } else if (c == OR)
+                {
+                    Automaton<string> nfa2 = nfaStack.Pop();
+                    Automaton<string> nfa1 = nfaStack.Pop();
+                    nfaStack.Push(this.ConstructOr(nfa1, nfa2));
+                }
+                else if (c == STAR)
+                {
+                    nfaStack.Push(this.ConstructStar(nfaStack.Pop()));
+                } 
+                else if (c == CONCATENATION)
+                {
+                    Automaton<string> nfa2 = nfaStack.Pop();
+                    Automaton<string> nfa1 = nfaStack.Pop();
+                    nfaStack.Push(this.ConstructConcatenation(nfa1, nfa2));
+                }
+            }
+            return nfaStack.Pop();
+        }
+
+        private Automaton<string> ConstructSymbol(char symbol)
+        {
+            Automaton<string> nfa = new Automaton<string>();
+
+            string state1 = this.namer.GetNew();
+            string state2 = this.namer.GetNew();
+
+            nfa.AddTransition(new Transition<string>(state1, symbol, state2));
+
+            nfa.DefineAsStartState(state1);
+            nfa.DefineAsFinalState(state2);
+
+            return nfa;
+        }
+
+        private Automaton<string> ConstructOr(Automaton<string> nfa1, Automaton<string> nfa2)
+        {
+            Automaton<string> nfa0 = new Automaton<string>();
+
+            string state1 = this.namer.GetNew();
+            string state2 = this.namer.GetNew();
+
+            nfa0.AddTransition(nfa1.GetTransitions());
+            nfa0.AddTransition(nfa2.GetTransitions());
+
+            nfa0.AddTransition(new Transition<string>(state1, nfa1.GetStartStates().First()));
+            nfa0.AddTransition(new Transition<string>(state1, nfa2.GetStartStates().First()));
+
+            nfa0.AddTransition(new Transition<string>(nfa1.GetFinalStates().First(), state2));
+            nfa0.AddTransition(new Transition<string>(nfa2.GetFinalStates().First(), state2));
+
+            nfa0.DefineAsStartState(state1);
+            nfa0.DefineAsFinalState(state2);
+
+            return nfa0;
+        }
+
+        private Automaton<string> ConstructStar(Automaton<string> nfa)
+        {
+            string state1 = this.namer.GetNew();
+            string state2 = this.namer.GetNew();
+
+            nfa.AddTransition(new Transition<string>(state1, nfa.GetStartStates().First()));
+            nfa.AddTransition(new Transition<string>(nfa.GetFinalStates().First(), state2));
+            nfa.AddTransition(new Transition<string>(nfa.GetFinalStates().First(), nfa.GetStartStates().First()));
+            nfa.AddTransition(new Transition<string>(state1, state2));
+
+            nfa.ResetStartFinalStates();
+            nfa.DefineAsStartState(state1);
+            nfa.DefineAsFinalState(state2);
+
+            return nfa;
+        }
+
+        private Automaton<string> ConstructConcatenation(Automaton<string> nfa1, Automaton<string> nfa2)
+        {
+            Automaton<string> nfa0 = new Automaton<string>();
+
+            nfa0.AddTransition(nfa1.GetTransitions());
+            nfa0.AddTransition(nfa2.GetTransitions());
+
+            nfa0.AddTransition(new Transition<string>(nfa1.GetFinalStates().First(), nfa2.GetStartStates().First()));
+
+            nfa0.DefineAsStartState(nfa1.GetStartStates().First());
+            nfa0.DefineAsFinalState(nfa2.GetFinalStates().First());
+
+            return nfa0;
+        }
     }
 }
