@@ -1,4 +1,5 @@
 ﻿using Automaton;
+using static UIMethods.Core.Regex;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,12 +52,19 @@ namespace UIMethods
 
         private void ProcessBtn_Click(object sender, RoutedEventArgs e)
         {
-            Automaton<string> automaton = Automaton<string>.GenerateFromRegex(this.input);
-            logline.Text = logline.Text + enterStr + automaton.ToString();
-            foreach(Transition<string> transition in automaton.getTransitions())
-            {
-                logline.Text = logline.Text + enterStr + transition.ToString();
-            }
+            //Automaton<string> automaton = Automaton<string>.GenerateFromRegex(this.input);
+            //logline.Text = logline.Text + enterStr + automaton.ToString();
+            //foreach(Transition<string> transition in automaton.getTransitions())
+            //{
+            //    logline.Text = logline.Text + enterStr + transition.ToString();
+            //}
+
+            Core.Regex regex = new Core.Regex(input);
+            regex.ProcessConcatenated();
+            logline.Text = logline.Text + enterStr + regex.Concatenated;
+            regex.ShuntingYardPostfix();
+            logline.Text = logline.Text + enterStr + regex.Postfix;
+
         }
 
         private void TestBtn_Click(object sender, RoutedEventArgs e)

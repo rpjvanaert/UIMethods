@@ -204,7 +204,7 @@ namespace Automaton
             }
         }
 
-        public ISet<Transition<T>> getTransitions()
+        public ISet<Transition<T>> GetTransitions()
         {
             return this.transitions;
         }
@@ -214,14 +214,29 @@ namespace Automaton
             PrintStates(startStates);
         }
 
+        public SortedSet<T> GetStartStates()
+        {
+            return this.startStates;
+        }
+
         public void PrintFinalStates()
         {
             PrintStates(finalStates);
         }
 
+        public SortedSet<T> GetFinalStates()
+        {
+            return this.finalStates;
+        }
+
         public void PrintAllStates()
         {
             PrintStates(states);
+        }
+
+        public SortedSet<T> GetAllStates()
+        {
+            return states;
         }
 
         /// <summary>
@@ -619,51 +634,6 @@ namespace Automaton
 
 
             return automaton;
-        }
-
-
-        private static int isp(char c)
-        {
-            switch (c)
-            {
-                case '#':
-                    return 0;
-                case '(':
-                    return 1;
-                case '*':
-                    return 7;
-                case '+':
-                    return 7;
-                case '.':
-                    return 5;
-                case '|':
-                    return 3;
-                case ')':
-                    return 8;
-            }
-            return -1;
-        }
-
-        private static int icp(char c)
-        {
-            switch (c)
-            {
-                case '#':
-                    return 0;
-                case '(':
-                    return 8;
-                case '*':
-                    return 6;
-                case '+':
-                    return 6;
-                case '.':
-                    return 4;
-                case '|':
-                    return 2;
-                case ')':
-                    return 1;
-            }
-            return -1;
         }
 
 
