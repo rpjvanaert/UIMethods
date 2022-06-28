@@ -45,36 +45,38 @@ namespace UIMethods
 
             if (match.Success) succes = "\" is a regular expression";
 
-            logline.Text = logline.Text + enterStr + "\"" + input + succes;
+            this.Log("\"" + input + succes);
 
 
         }
 
         private void ProcessBtn_Click(object sender, RoutedEventArgs e)
         {
-            //Automaton<string> automaton = Automaton<string>.GenerateFromRegex(this.input);
-            //logline.Text = logline.Text + enterStr + automaton.ToString();
-            //foreach(Transition<string> transition in automaton.getTransitions())
-            //{
-            //    logline.Text = logline.Text + enterStr + transition.ToString();
-            //}
-
             Core.Regex regex = new Core.Regex(input);
+
             regex.ProcessConcatenated();
-            logline.Text = logline.Text + enterStr + regex.Concatenated;
+            this.Log("Processed Concatenated: " + regex.Concatenated);
+
             regex.ShuntingYardPostfix();
-            logline.Text = logline.Text + enterStr + regex.Postfix;
+            this.Log("Processed SY-Postfix: " + regex.Postfix);
+
             Automaton<string> automaton = regex.ConstructThompson();
-            logline.Text = logline.Text + enterStr + automaton.ToString();
+            this.Log(automaton.ToString());
+
             foreach (Transition<string> transition in automaton.GetTransitions())
             {
-                logline.Text = logline.Text + enterStr + transition.ToString();
+                this.Log(transition.ToString());
             }
         }
 
         private void TestBtn_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void Log(string text)
+        {
+            logline.Text = logline.Text + enterStr + text;
         }
     }
 }

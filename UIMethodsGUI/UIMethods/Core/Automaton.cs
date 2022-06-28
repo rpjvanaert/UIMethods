@@ -245,8 +245,6 @@ namespace Automaton
         /// <returns>True if the automata object is deterministic (DFA)</returns>
         public bool IsDFA()
         {
-            // TODO Write code that returns true if the Automaton is deterministic, false if it is non-deterministic
-
             // Check multiple start states
             if (this.startStates.Count != 1) return false;
 
@@ -255,6 +253,8 @@ namespace Automaton
             {
                 if (transition.GetSymbol() == Transition<T>.EPSILON) return false;
             }
+
+            //TODO(opt) check if states have multiple ways to go with same symbol
 
             return true;
         }
@@ -271,9 +271,22 @@ namespace Automaton
 
             foreach (Transition<T> transition in this.transitions)
             {
-                if (transition.GetFromState().Equals(from) && transition.GetSymbol().Equals(symbol))
+                if (transition.GetFromState().Equals(from))
                 {
-                    states.Add(transition.GetToState());
+                    if (transition.GetSymbol().Equals(symbol))
+                    {
+                        states.Add(transition.GetToState());
+                    }
+                    else
+                    {
+                        ISet<T> epsilonClosure = this.GetToStates(transition.GetFromState());
+                        foreach (T state in epsilonClosure)
+                        {
+                            states.Add(state);
+                        }
+                        
+                    }
+                    
                 }
             }
 
@@ -331,19 +344,49 @@ namespace Automaton
         }
 
 
-        ///// <summary>
-        ///// return the set of states that can be reached from a given state using an epsilon transition (i.e. no symbol received)
-        ///// note: this is basically the epsilon closure of the given state
-        ///// </summary>
-        ///// <param name="from">the state to start from</param>
-        ///// <returns>the set of destination states (not including the from state)</returns>
-        //public iset<t> gettostates(t from)
-        //{
-        //    // follow all epsilon transitions starting in the from state
-        //    sortedset<t> states = new sortedset<t>();
-        //    ...  
-        //    return states;
-        //}
+        /// <summary>
+        /// Converts NFA to DFA
+        /// </summary>
+        /// <returns>Returns a transition for this letter</returns>
+        private bool ConvertToDFA()
+        {
+            if (this.IsDFA()) throw new Exception("Already a DFA");
+            bool converted = false;
+
+
+
+            return converted;
+        }
+
+
+        /// <summary>
+        /// return the set of states that can be reached from a given state using an epsilon transition (i.e. no symbol received)
+        /// note: this is basically the epsilon closure of the given state
+        /// </summary>
+        /// <param name="from">the state to start from</param>
+        /// <returns>the set of destination states (not including the from state)</returns>
+        public ISet<T> GetToStates(T from)
+        {
+            // follow all epsilon transitions starting in the from state
+            SortedSet<T> states = new SortedSet<T>();
+            
+            foreach (Transition<T> transition in this.transitions)
+            {
+                if (transition.GetFromState().Equals(from) && transition.GetSymbol().Equals(Transition<T>.EPSILON))
+                {
+                    states.Add(transition.GetToState());
+
+                    ISet<T> otherStates = this.GetToStates(transition.GetToState());
+
+                    foreach (T otherState in otherStates)
+                    {
+                        states.Add(otherState);
+                    }
+                }
+            }
+
+            return states;
+        }
 
         ///// <summary>
         ///// Return true if a given sequence is accepted by the automata object (even if it is an NDFA)
