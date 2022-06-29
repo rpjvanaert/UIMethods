@@ -254,13 +254,14 @@ namespace Automaton
                 if (transition.GetSymbol() == Transition<T>.EPSILON) return false;
             }
 
-            //TODO(opt) check if states have multiple ways to go with same symbol
+            // TODO(opt) check if states have multiple ways to go with same symbol
 
             return true;
         }
 
         /// <summary>
         /// Return the set of states that can be reached from a given state when a given symbol is received
+        /// Epsilon closure path discovery included
         /// </summary>
         /// <param name="from">The state to start from</param>
         /// <param name="symbol">The symbol that is received</param>
@@ -268,25 +269,48 @@ namespace Automaton
         public ISet<T> GetToStates(T from, char symbol)
         {
             SortedSet<T> states = new SortedSet<T>();
+            ISet<T> epsilonStates;
 
+            // Check each transition (first char then epsilon)
             foreach (Transition<T> transition in this.transitions)
             {
-                if (transition.GetFromState().Equals(from))
+                // If transition is the 'from' state and goes with symbol
+                if (transition.GetFromState().Equals(from) && transition.GetSymbol().Equals(symbol))
                 {
-                    if (transition.GetSymbol().Equals(symbol))
+                    // Add end state of transition to states
+                    states.Add(transition.GetToState());
+
+                    // Add all epsilon possible states
+                    epsilonStates = this.GetToStates(transition.GetToState());
+                    foreach(T t in epsilonStates)
                     {
+                        states.Add(t);
+                    }
+                }
+            }
+
+            // Check each transition (first epsilon then char)
+            epsilonStates = this.GetToStates(from);
+
+            // For each epsilon state, check each transition it has
+            foreach(T state in epsilonStates)
+            {
+                foreach(Transition<T> transition in this.transitions)
+                {
+
+                    // If that transition is from the ending epsilon closure state and has the symbol
+                    if (transition.GetFromState().Equals(state) && transition.GetSymbol().Equals(symbol))
+                    {
+                        // Add end state of transition to states
                         states.Add(transition.GetToState());
-                    }
-                    else
-                    {
-                        ISet<T> epsilonClosure = this.GetToStates(transition.GetFromState());
-                        foreach (T state in epsilonClosure)
+
+                        // Add all epsilon possible states
+                        epsilonStates = this.GetToStates(transition.GetToState());
+                        foreach (T t in epsilonStates)
                         {
-                            states.Add(state);
+                            states.Add(t);
                         }
-                        
                     }
-                    
                 }
             }
 
