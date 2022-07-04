@@ -40,6 +40,7 @@ namespace UIMethods.Core
             switch (c)
             {
                 case STAR:   return 2;
+                case PLUS: return 2;
                 case CONCATENATION:   return 1;
                 case OR:   return 0;
                 default:    return -1;
@@ -58,7 +59,14 @@ namespace UIMethods.Core
                     ++ic;
                     this.Concatenated = this.Concatenated.Insert(ic, Char.ToString(CONCATENATION));
                 }
-                else if (Char.IsLetter(this.Concatenated[(ic + 1)]) && (this.Concatenated[ic] == CLOSE || this.Concatenated[ic] == STAR || this.Concatenated[ic] == PLUS))
+                else if (
+                    Char.IsLetter(this.Concatenated[(ic + 1)]) && 
+                    (
+                        this.Concatenated[ic] == CLOSE ||
+                        this.Concatenated[ic] == STAR ||
+                        this.Concatenated[ic] == PLUS ||
+                        Char.IsLetter(this.Concatenated[ic])
+                    ))
                 {
                     ++ic;
                     this.Concatenated = this.Concatenated.Insert(ic, Char.ToString(CONCATENATION));
@@ -140,7 +148,11 @@ namespace UIMethods.Core
                 else if (c == STAR)
                 {
                     nfaStack.Push(this.ConstructStar(nfaStack.Pop()));
-                } 
+                }
+                else if (c == PLUS)
+                {
+                    nfaStack.Push(this.ConstructPlus(nfaStack.Pop()));
+                }
                 else if (c == CONCATENATION)
                 {
                     Automaton<string> nfa2 = nfaStack.Pop();
@@ -190,13 +202,21 @@ namespace UIMethods.Core
 
         private Automaton<string> ConstructStar(Automaton<string> nfa)
         {
+            nfa = ConstructPlus(nfa);
+
+            nfa.AddTransition(new Transition<string>(nfa.GetStartStates().First(), nfa.GetFinalStates().First()));
+
+            return nfa;
+        }
+
+        private Automaton<string> ConstructPlus(Automaton<string> nfa)
+        {
             string state1 = this.namer.GetNew();
             string state2 = this.namer.GetNew();
 
             nfa.AddTransition(new Transition<string>(state1, nfa.GetStartStates().First()));
             nfa.AddTransition(new Transition<string>(nfa.GetFinalStates().First(), state2));
             nfa.AddTransition(new Transition<string>(nfa.GetFinalStates().First(), nfa.GetStartStates().First()));
-            nfa.AddTransition(new Transition<string>(state1, state2));
 
             nfa.ResetStartFinalStates();
             nfa.DefineAsStartState(state1);
