@@ -8,12 +8,13 @@ using Automaton;
 
 namespace AutomatonTest
 {
-    internal class ConversionTest
+    public class ConversionTest
     {
 
         [Test]
         public void ConvertToDfaStringTest()
         {
+            //abc
             Automaton<string> nfa = new Automaton<string>(new SortedSet<char>() { 'a', 'b', 'c' });
 
             nfa.AddTransition(new Transition<string>("S0", 'a', "S1"));
@@ -54,6 +55,7 @@ namespace AutomatonTest
         [Test]
         public void ConvertToDfaStarTest()
         {
+            //ab*
             Automaton<string> nfa = new Automaton<string>(new SortedSet<char>() { 'a', 'b' });
 
             nfa.AddTransition(new Transition<string>("S0", 'a', "S1"));
@@ -88,6 +90,7 @@ namespace AutomatonTest
         [Test]
         public void ConvertToDfaPlusTest()
         {
+            //ab+
             Automaton<string> nfa = new Automaton<string>(new SortedSet<char>() { 'a', 'b' });
 
             nfa.AddTransition(new Transition<string>("S0", 'a', "S1"));
@@ -122,6 +125,7 @@ namespace AutomatonTest
         [Test]
         public void ConvertToDfaOrTest()
         {
+            //a|b
             Automaton<string> nfa = new Automaton<string>(new SortedSet<char>() { 'a', 'b' });
 
             nfa.AddTransition(new Transition<string>("S0", 'a', "S1"));

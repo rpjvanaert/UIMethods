@@ -410,6 +410,9 @@ namespace Automaton
         /// <returns> new automaton with new state names </returns>
         public static Automaton<string> RenameAll(Automaton<string> automaton)
         {
+            if (automaton == null) return null; // return null, because not created here
+            if (automaton.transitions.Count == 0 || automaton.startStates.Count == 0 || automaton.finalStates.Count == 0) return automaton;
+
             Automaton<string> renamed = new Automaton<string>();
             renamed.SetAlphabet(automaton.GetAlphabet().ToArray());
 

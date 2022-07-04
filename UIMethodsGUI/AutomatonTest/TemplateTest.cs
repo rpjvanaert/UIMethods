@@ -8,7 +8,7 @@ using Automaton;
 
 namespace AutomatonTest
 {
-    internal class TemplateTest
+    public class TemplateTest
     {
 
         [SetUp]

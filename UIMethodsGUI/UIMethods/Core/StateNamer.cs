@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Automaton
 {
-    internal class StateNamer
+    public class StateNamer
     {
 
         private int _state;
