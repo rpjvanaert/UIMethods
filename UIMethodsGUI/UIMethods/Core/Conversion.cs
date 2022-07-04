@@ -87,9 +87,11 @@ namespace Automaton
             return dfa;
         }
 
-        private static  string CombineStates (SortedSet<string> states)
+        public static  string CombineStates (SortedSet<string> states)
         {
             string combinedState = "{";
+
+            if (states == null || states.Count == 0) return "{}";
             foreach (string state in states)
             {
                 combinedState += state + ",";
@@ -101,8 +103,11 @@ namespace Automaton
             return combinedState;
         }
 
-        private static bool Contains(List<string[]> set, string[] item)
+        public static bool Contains(List<string[]> set, string[] item)
         {
+            if (set == null || set.Count == 0) return false;
+            if (item == null || item.Length == 0) return false;
+
             foreach (string[] eachItem in set)
             {
                 if (eachItem.Length == item.Length)
