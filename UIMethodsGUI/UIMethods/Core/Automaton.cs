@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UIMethods.Core;
 
 namespace Automaton
 {
@@ -13,7 +14,7 @@ namespace Automaton
     /// This is a template class to allow for different state types, e.g. tuples when two (N)DFA's are combined into one
     /// </summary>
     /// <typeparam name="T">Substitute a suitable type for a state in the (N)DFA as T (such as char, string, or a tuple)</typeparam>
-    class Automaton<T> where T : IComparable<T>
+    public class Automaton<T> where T : IComparable<T>
     {
         private ISet<Transition<T>> transitions;
 
@@ -109,6 +110,11 @@ namespace Automaton
         public void SetAlphabet(SortedSet<char> symbols)
         {
             this.symbols = new SortedSet<char>(symbols.ToList<char>());
+        }
+
+        public ISet<char> GetAlphabet()
+        {
+            return this.symbols;
         }
 
         /// <summary>
@@ -369,25 +375,10 @@ namespace Automaton
 
 
         /// <summary>
-        /// Converts NFA to DFA
-        /// </summary>
-        /// <returns>Returns a transition for this letter</returns>
-        private bool ConvertToDFA()
-        {
-            if (this.IsDFA()) throw new Exception("Already a DFA");
-            bool converted = false;
-
-
-
-            return converted;
-        }
-
-
-        /// <summary>
         /// return the set of states that can be reached from a given state using an epsilon transition (i.e. no symbol received)
         /// note: this is basically the epsilon closure of the given state
         /// </summary>
-        /// <param name="from">the state to start from</param>
+        /// <param name="from"> the state to start from </param>
         /// <returns>the set of destination states (not including the from state)</returns>
         public ISet<T> GetToStates(T from)
         {
@@ -410,6 +401,42 @@ namespace Automaton
             }
 
             return states;
+        }
+
+        /// <summary>
+        /// renames all states counting from begin state
+        /// </summary>
+        /// <param name="automaton"> automaton to rename the states of </param>
+        /// <returns> new automaton with new state names </returns>
+        public static Automaton<string> RenameAll(Automaton<string> automaton)
+        {
+            Automaton<string> renamed = new Automaton<string>();
+            renamed.SetAlphabet(automaton.GetAlphabet().ToArray());
+
+            StateNamer stateNamer = new StateNamer('S');
+
+            Dictionary<string, string> dictionaryRenames = new Dictionary<string, string>();
+
+            dictionaryRenames.Add(automaton.GetStartStates().First(), stateNamer.GetNew());
+
+            foreach (string state in automaton.GetAllStates())
+            {
+                if (!dictionaryRenames.ContainsKey(state)) dictionaryRenames.Add(state, stateNamer.GetNew());
+            }
+
+            foreach (Transition<string> transition in automaton.GetTransitions())
+            {
+                renamed.AddTransition(new Transition<string>(dictionaryRenames[transition.GetFromState()], transition.GetSymbol(), dictionaryRenames[transition.GetToState()]));
+            }
+
+            renamed.DefineAsStartState(dictionaryRenames[automaton.GetStartStates().First()]);
+
+            foreach (string finalState in automaton.GetFinalStates())
+            {
+                renamed.DefineAsFinalState(dictionaryRenames[finalState]);
+            }
+
+            return renamed;
         }
 
         ///// <summary>

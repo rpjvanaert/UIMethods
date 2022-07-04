@@ -1,5 +1,4 @@
 ﻿using Automaton;
-using static UIMethods.Core.Regex;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +28,10 @@ namespace UIMethods
         private static readonly string enterStr = "\n";
         private static readonly string regexRegex = @"^(?:(?:[^?+*{}()[\]\\|]+|\\.|\[(?:\^?\\.|\^[^\\]|[^\\^])(?:[^\]\\]+|\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>|\?<[^\W\d]\w*>|\?'[^\W\d]\w*')?(?<N>)|\)(?<-N>))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*$(?(N)(?!))";
 
+        private Automaton.Regex regex = null;
+        private Automaton<string> nfa = null;
+        private Automaton<string> dfa = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,10 +39,14 @@ namespace UIMethods
 
         private void CheckBtn_Click(object sender, RoutedEventArgs e)
         {
+            this.regex = null;
+            this.nfa = null;
+            this.dfa = null;
+
             this.input = InputBox.Text.Split('\n').Last(); ;
             Console.WriteLine(input);
 
-            Match match = Regex.Match(input, regexRegex);
+            Match match = System.Text.RegularExpressions.Regex.Match(input, regexRegex);
 
             string succes = "\" is not a regular expression...";
 
@@ -50,20 +57,45 @@ namespace UIMethods
 
         }
 
-        private void ProcessBtn_Click(object sender, RoutedEventArgs e)
+        private void SYBtn_Click(object sender, RoutedEventArgs e)
         {
-            Core.Regex regex = new Core.Regex(input);
+            if (this.input == null) { this.Log("Input is not available"); return; }
+
+            this.regex = new Automaton.Regex(input);
 
             regex.ProcessConcatenated();
-            this.Log("Processed Concatenated: " + regex.Concatenated);
+            this.Log("Processed Concatenated: " + this.regex.Concatenated);
 
             regex.ShuntingYardPostfix();
-            this.Log("Processed SY-Postfix: " + regex.Postfix);
+            this.Log("Processed Shunting-Yard-Postfix: " + this.regex.Postfix);
+            
+        }
 
-            Automaton<string> automaton = regex.ConstructThompson();
-            this.Log(automaton.ToString());
+        private void CnvrtNfaBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.regex == null) { this.Log("Processed regex is not available"); return; }
 
-            foreach (Transition<string> transition in automaton.GetTransitions())
+            this.nfa = regex.ConstructThompson();
+            this.Log("NFA made from regex");
+            this.Log(nfa.ToString());
+
+            foreach (Transition<string> transition in this.nfa.GetTransitions())
+            {
+                this.Log(transition.ToString());
+            }
+        }
+
+        private void CnvrtDfaBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.nfa == null) { this.Log("NFA not made yet"); return; }
+
+            this.dfa = Conversion.ConvertToDfa(this.nfa);
+
+            this.dfa = Automaton<string>.RenameAll(this.dfa);
+
+            this.Log(this.dfa.ToString());
+
+            foreach (Transition<string> transition in this.dfa.GetTransitions())
             {
                 this.Log(transition.ToString());
             }
@@ -71,7 +103,11 @@ namespace UIMethods
 
         private void TestBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (this.dfa == null) { this.Log("DFA not made yet"); return; }
 
+            string testword = TestBox.Text.Split('\n').Last();
+
+            this.Log("Tested '" + testword + "' : " + this.dfa.AcceptDFAOnly(testword));
         }
 
         private void Log(string text)

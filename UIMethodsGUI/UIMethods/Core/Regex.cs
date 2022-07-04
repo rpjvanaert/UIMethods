@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UIMethods.Core
+namespace Automaton
 {
-    class Regex
+    public class Regex
     {
 
         public const char OPEN = '(';
@@ -54,7 +54,8 @@ namespace UIMethods.Core
             int ic = 0;
             while ((ic + 1) < this.Concatenated.Length)
             {
-                if (Char.IsLetter(this.Concatenated[ic]) && this.Concatenated[(ic + 1)] == OPEN)
+                if ((Char.IsLetter(this.Concatenated[ic]) || this.Concatenated[ic] == STAR || this.Concatenated[ic] == PLUS) 
+                    && this.Concatenated[(ic + 1)] == OPEN)
                 {
                     ++ic;
                     this.Concatenated = this.Concatenated.Insert(ic, Char.ToString(CONCATENATION));
@@ -81,6 +82,50 @@ namespace UIMethods.Core
         {
             this.Postfix = "";
             Stack<char> operators = new Stack<char>();
+
+            //foreach (char c in this.Concatenated)
+            //{
+            //    if (Char.IsLetter(c))
+            //    {
+            //        this.Postfix += c;
+            //    } else if (IsOperator(c))
+            //    {
+            //        while (operators.Count > 0)
+            //        {
+
+            //            if (GetOperatorValue(operators.Peek()) >= GetOperatorValue(c))
+            //            {
+            //                this.Postfix += operators.Pop();
+            //            }
+            //            else
+            //            {
+            //                break;
+            //            }
+
+            //        } 
+            //        operators.Push(c);
+                    
+            //    } 
+            //    else if (c == OPEN)
+            //    {
+            //        operators.Append(c);
+            //    }
+            //    else if (c == CLOSE)
+            //    {
+            //        while (operators.Count > 0)
+            //        {
+            //            if (operators.Peek() == OPEN)
+            //            {
+            //                operators.Pop();
+            //                break;
+            //            }
+            //            else
+            //            {
+            //                this.Postfix += operators.Pop();
+            //            }
+            //        }
+            //    }
+            //}
 
             foreach (char c in this.Concatenated)
             {
@@ -109,13 +154,18 @@ namespace UIMethods.Core
                         }
                     }
                 }
-                else if (GetOperatorValue(c) >= GetOperatorValue(operators.Peek()))
+                else if (GetOperatorValue(operators.Peek()) >= GetOperatorValue(c))
                 {
+                    this.Postfix += operators.Pop();
+
+                    while (operators.Count > 0 && (GetOperatorValue(operators.Peek()) >= GetOperatorValue(c)))
+                    {
+                        this.Postfix += operators.Pop();
+                    }
                     operators.Push(c);
                 } else
                 {
-                    this.Postfix += operators.Pop();
-                    this.Postfix += c;
+                    operators.Push(c);
                 }
             }
 
@@ -160,7 +210,17 @@ namespace UIMethods.Core
                     nfaStack.Push(this.ConstructConcatenation(nfa1, nfa2));
                 }
             }
-            return nfaStack.Pop();
+
+            SortedSet<char> alphabet = new SortedSet<char>();
+
+            foreach (char each in this.String)
+            {
+                if (char.IsLetter(each)) alphabet.Add(each);
+            }
+
+            Automaton<string> automaton = nfaStack.Pop();
+            automaton.SetAlphabet(alphabet.ToArray());
+            return automaton;
         }
 
         private Automaton<string> ConstructSymbol(char symbol)

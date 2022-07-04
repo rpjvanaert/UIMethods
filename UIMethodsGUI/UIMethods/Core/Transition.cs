@@ -10,7 +10,7 @@ namespace Automaton
     /// Class that represents a transition from one state to another state resulting from the reception of a symbol
     /// </summary>
     /// <typeparam name="T">Substitute a suitable type for a state as T</typeparam>
-    class Transition<T> : IComparable<Transition<T>> where T : IComparable<T>
+    public class Transition<T> : IComparable<Transition<T>> where T : IComparable<T>
     {
         public static readonly char EPSILON = '$'; // Represents the empty symbol epsilon
 

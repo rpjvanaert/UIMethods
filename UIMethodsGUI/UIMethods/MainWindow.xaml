@@ -20,6 +20,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="92"/>
                 <RowDefinition/>
+                <RowDefinition Height="92"/>
             </Grid.RowDefinitions>
 
 
@@ -51,15 +52,15 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Process"
+                <Button Content="Postfix"
                              Height="50"
                              Foreground="White"
                         Background="YellowGreen"
                              FontSize="24"
                         Margin="12"
                         FontFamily="/Fonts/#Poppins"
-                        x:Name="ProcessBtn"
-                        Click="ProcessBtn_Click"
+                        x:Name="PostfixBtn"
+                        Click="SYBtn_Click"
                     >
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -68,15 +69,32 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Test"
+                <Button Content="Convert to NFA"
                              Height="50"
                              Foreground="White"
-                        Background="Orange"
+                        Background="YellowGreen"
                              FontSize="24"
                         Margin="12"
                         FontFamily="/Fonts/#Poppins"
-                        x:Name="TestBtn"
-                        Click="TestBtn_Click"
+                        x:Name="CnvrtNfaBtn"
+                        Click="CnvrtNfaBtn_Click"
+                    >
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="12"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="Convert to DFA"
+                             Height="50"
+                             Foreground="White"
+                        Background="YellowGreen"
+                             FontSize="24"
+                        Margin="12"
+                        FontFamily="/Fonts/#Poppins"
+                        x:Name="CnvrtDfaBtn"
+                        Click="CnvrtDfaBtn_Click"
                     >
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -117,7 +135,10 @@
                     HorizontalAlignment="Center" Width="640" Height="512"
                     >
                     
-                    <TextBlock
+                    <StackPanel VerticalAlignment="Top"
+                                HorizontalAlignment="Left">
+                        
+                        <TextBlock
                     x:Name="logline"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
@@ -128,11 +149,54 @@
                 >
                 Hello
                 </TextBlock>
+                        
+                        <Rectangle Width="624" Height="64"></Rectangle>
+                        
+                    </StackPanel>
+                    
+                    
                     
                 </ScrollViewer>
                 
 
             </Border>
+            
+            <Button Content="Test"
+                             Height="50"
+                             Foreground="White"
+                        Background="Orange"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                             FontSize="24"
+                        Margin="12"
+                        FontFamily="/Fonts/#Poppins"
+                        x:Name="TestBtn"
+                        Click="TestBtn_Click"
+                    >
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="12"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            
+            <TextBox Width="640"
+                     Height="64"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Padding="16"
+                     Grid.Column="1"
+                     Grid.Row="2"
+                     FontFamily="/Fonts/#Poppins"
+                     x:Name="TestBox"
+                     xml:space="preserve"
+                     Margin="24"
+                     BorderThickness="0"
+                     Background="#444254"
+                     FontSize="16"
+                     Foreground="#CFCFCF"
+                     CaretBrush="#CECECE"
+                />
 
         </Grid>
     </Border>
