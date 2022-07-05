@@ -18,6 +18,8 @@ namespace Automaton
         public const char CONCATENATION = '?';
         public const string _CONC = "?";
 
+        private static char[] alphabet = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+
         public string String { get; set; } = string.Empty;
         public string Concatenated { get; set; } = string.Empty;
         public string Postfix { get; set; } = string.Empty;
@@ -82,50 +84,6 @@ namespace Automaton
         {
             this.Postfix = "";
             Stack<char> operators = new Stack<char>();
-
-            //foreach (char c in this.Concatenated)
-            //{
-            //    if (Char.IsLetter(c))
-            //    {
-            //        this.Postfix += c;
-            //    } else if (IsOperator(c))
-            //    {
-            //        while (operators.Count > 0)
-            //        {
-
-            //            if (GetOperatorValue(operators.Peek()) >= GetOperatorValue(c))
-            //            {
-            //                this.Postfix += operators.Pop();
-            //            }
-            //            else
-            //            {
-            //                break;
-            //            }
-
-            //        } 
-            //        operators.Push(c);
-                    
-            //    } 
-            //    else if (c == OPEN)
-            //    {
-            //        operators.Append(c);
-            //    }
-            //    else if (c == CLOSE)
-            //    {
-            //        while (operators.Count > 0)
-            //        {
-            //            if (operators.Peek() == OPEN)
-            //            {
-            //                operators.Pop();
-            //                break;
-            //            }
-            //            else
-            //            {
-            //                this.Postfix += operators.Pop();
-            //            }
-            //        }
-            //    }
-            //}
 
             foreach (char c in this.Concatenated)
             {
@@ -298,6 +256,71 @@ namespace Automaton
             nfa0.DefineAsFinalState(nfa2.GetFinalStates().First());
 
             return nfa0;
+        }
+
+        public static Automaton<string> GetRegexAcceptor()
+        {
+            Automaton<string> automaton = new Automaton<string>(new SortedSet<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '(', ')', '*', '+', '|' });
+
+            automaton.AddTransition(GetRegexPart(0));
+
+            automaton.DefineAsStartState("S0");
+            automaton.DefineAsFinalState("S1");
+            
+            for (int i = 1; i < 3; i++)
+            {
+                automaton.AddTransition(GetRegexPart(i));
+                automaton.AddTransition(GetParenthesis(i));
+            }
+
+            automaton = Conversion.ConvertToDfa(automaton);
+
+            return automaton;
+        }
+
+        private static ISet<Transition<string>> GetRegexPart(int n)
+        {
+            Automaton<string> transitions = new Automaton<string>();
+
+            string n0 = "S" + (2 * n);
+            string n1 = "S" + (2 * n + 1);
+
+            transitions.AddTransition(GetTransitionsAlphabet(n0, n1));
+            transitions.AddTransition(GetTransitionsAlphabet(n1, n1));
+
+            transitions.AddTransition(new Transition<string>(n1, '*', n1));
+            transitions.AddTransition(new Transition<string>(n1, '+', n1));
+            transitions.AddTransition(new Transition<string>(n1, '|', n0));
+
+            return transitions.GetTransitions();
+        }
+
+        private static ISet<Transition<string>> GetParenthesis(int to)
+        {
+            Automaton<string> transitions = new Automaton<string>();
+
+            string n0 = "S" + (2 * (to - 1));
+            string n1 = "S" + (2 * (to - 1) + 1);
+            string n2 = "S" + (2 * to);
+            string n3 = "S" + (2 * to + 1);
+
+            transitions.AddTransition(new Transition<string>(n0, '(', n2));
+            transitions.AddTransition(new Transition<string>(n1, '(', n2));
+            transitions.AddTransition(new Transition<string>(n3, ')', n1));
+
+            return transitions.GetTransitions();
+        }
+
+        private static SortedSet<Transition<string>> GetTransitionsAlphabet(string from, string to)
+        {
+            SortedSet<Transition<string>> transitions = new SortedSet<Transition<string>>();
+
+            foreach (char c in alphabet)
+            {
+                transitions.Add(new Transition<string>(from, c, to));
+            }
+
+            return transitions;
         }
     }
 }

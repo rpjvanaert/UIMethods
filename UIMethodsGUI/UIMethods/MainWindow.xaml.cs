@@ -27,7 +27,7 @@ namespace UIMethods
         private string input = "";
 
         private static readonly string enterStr = "\n";
-        private static readonly string regexRegex = @"^(?:(?:[^?+*{}()[\]\\|]+|\\.|\[(?:\^?\\.|\^[^\\]|[^\\^])(?:[^\]\\]+|\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>|\?<[^\W\d]\w*>|\?'[^\W\d]\w*')?(?<N>)|\)(?<-N>))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*$(?(N)(?!))";
+        //private static readonly string regexRegex = @"^(?:(?:[^?+*{}()[\]\\|]+|\\.|\[(?:\^?\\.|\^[^\\]|[^\\^])(?:[^\]\\]+|\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>|\?<[^\W\d]\w*>|\?'[^\W\d]\w*')?(?<N>)|\)(?<-N>))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*$(?(N)(?!))";
 
         private Automaton<string> regexAcceptor;
 
@@ -39,7 +39,6 @@ namespace UIMethods
         {
             InitializeComponent();
             this.regexAcceptor = Automaton.Regex.GetRegexAcceptor();
-            this.regexAcceptor.AddTransition(new Transition<string>("S0", 'a', "S1"));
         }
 
         private void CheckBtn_Click(object sender, RoutedEventArgs e)
@@ -48,14 +47,13 @@ namespace UIMethods
             this.nfa = null;
             this.dfa = null;
 
-            this.input = InputBox.Text.Split('\n').Last(); ;
-            Console.WriteLine(input);
+            this.input = InputBox.Text.Split('\n').Last();
 
-            Match match = System.Text.RegularExpressions.Regex.Match(input, regexRegex);
+            //Match match = System.Text.RegularExpressions.Regex.Match(input, regexRegex);
 
             string succes = "\" is not a regular expression...";
 
-            if (match.Success) succes = "\" is a regular expression";
+            if (this.regexAcceptor.AcceptDFAOnly(input)) succes = "\" is a regular expression";
 
             this.Log("\"" + input + succes);
 
@@ -104,11 +102,6 @@ namespace UIMethods
             {
                 this.Log(transition.ToString());
             }
-        }
-
-        private void Visual_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void TestBtn_Click(object sender, RoutedEventArgs e)

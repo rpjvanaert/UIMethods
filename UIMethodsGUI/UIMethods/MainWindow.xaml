@@ -103,23 +103,6 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Visualize"
-                             Height="50"
-                             Foreground="White"
-                        Background="YellowGreen"
-                             FontSize="24"
-                        Margin="12"
-                        FontFamily="/Fonts/#Poppins"
-                        x:Name="Visual"
-                        Click="Visual_Click"
-                    >
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="12"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-
             </StackPanel>
 
             <TextBox Width="640"
