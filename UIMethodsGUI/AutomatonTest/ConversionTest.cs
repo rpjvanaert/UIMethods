@@ -99,6 +99,7 @@ namespace AutomatonTest
             nfa.AddTransition(new Transition<string>("S4", "S2"));
             nfa.AddTransition(new Transition<string>("S3", "S5"));
             nfa.AddTransition(new Transition<string>("S3", "S2"));
+
             nfa.AddTransition(new Transition<string>("S1", "S4"));
 
             nfa.DefineAsStartState("S0");

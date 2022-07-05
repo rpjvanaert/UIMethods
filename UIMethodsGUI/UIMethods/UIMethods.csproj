@@ -15,4 +15,11 @@
     <Folder Include="MVVM\View\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Graphviz" Version="2.38.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

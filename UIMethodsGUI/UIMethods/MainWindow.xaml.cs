@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace UIMethods
 {
     /// <summary>
@@ -28,6 +29,8 @@ namespace UIMethods
         private static readonly string enterStr = "\n";
         private static readonly string regexRegex = @"^(?:(?:[^?+*{}()[\]\\|]+|\\.|\[(?:\^?\\.|\^[^\\]|[^\\^])(?:[^\]\\]+|\\.)*\]|\((?:\?[:=!]|\?<[=!]|\?>|\?<[^\W\d]\w*>|\?'[^\W\d]\w*')?(?<N>)|\)(?<-N>))(?:(?:[?+*]|\{\d+(?:,\d*)?\})[?+]?)?|\|)*$(?(N)(?!))";
 
+        private Automaton<string> regexAcceptor;
+
         private Automaton.Regex regex = null;
         private Automaton<string> nfa = null;
         private Automaton<string> dfa = null;
@@ -35,6 +38,8 @@ namespace UIMethods
         public MainWindow()
         {
             InitializeComponent();
+            this.regexAcceptor = Automaton.Regex.GetRegexAcceptor();
+            this.regexAcceptor.AddTransition(new Transition<string>("S0", 'a', "S1"));
         }
 
         private void CheckBtn_Click(object sender, RoutedEventArgs e)
@@ -99,6 +104,11 @@ namespace UIMethods
             {
                 this.Log(transition.ToString());
             }
+        }
+
+        private void Visual_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void TestBtn_Click(object sender, RoutedEventArgs e)
