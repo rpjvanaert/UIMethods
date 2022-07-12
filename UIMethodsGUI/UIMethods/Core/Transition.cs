@@ -52,17 +52,28 @@ namespace Automaton
         {
         }
 
+        /// <summary>
+        /// Comparing 'this' transition and 'other' transition
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public int CompareTo(Transition<T> other)
         {
             if (other == null) return 1;
             int fromStateComparison = fromState.CompareTo(other.fromState);
             int symbolComparison = symbol.CompareTo(other.symbol);
             int toStateComparison = toState.CompareTo(other.toState);
+            // If from state is equal than symbol, if that is equal than to state comparison is returned (completely equal -> return 0)
             return (fromStateComparison != 0 ? fromStateComparison :
                 (symbolComparison != 0 ? symbolComparison :
                 toStateComparison));
         }
 
+        /// <summary>
+        /// Check if transitions are equal
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             return obj is Transition<T> transition &&
@@ -71,6 +82,10 @@ namespace Automaton
                    EqualityComparer<T>.Default.Equals(toState, transition.toState);
         }
 
+        /// <summary>
+        /// Determine hashcode based on values contained
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             var hashCode = 1250983160;
@@ -80,21 +95,31 @@ namespace Automaton
             return hashCode;
         }
 
+        // Simple formatting of transition
         public override string ToString()
         {
             return "(" + this.GetFromState() + ", " + this.GetSymbol() + ") --> " + this.GetToState();
         }
 
+        /// <summary>
+        /// Gets the state the transition is going from
+        /// </summary>
         public T GetFromState()
         {
             return fromState;
         }
 
+        /// <summary>
+        /// Gets the state the transition is going towards
+        /// </summary>
         public T GetToState()
         {
             return toState;
         }
 
+        /// <summary>
+        /// Gets the symbol the transition is using
+        /// </summary>
         public char GetSymbol()
         {
             return symbol;
