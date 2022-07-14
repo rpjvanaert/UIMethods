@@ -50,7 +50,7 @@ namespace Automaton
                 {
                     SortedSet<string> letterToStates = new SortedSet<string>();
 
-                    // each from state
+
                     foreach (string fromState in fromStates)
                     {
                         // Determine where the letter in the alphabet can go to and remember the states
@@ -62,13 +62,12 @@ namespace Automaton
                         }
                     }
 
-                    // Create combined state name
                     string combinedFromStates = CombineStates(new SortedSet<string>(fromStates));
 
                     // If letter has states to go to process, else to trapstate
                     if (letterToStates.Count > 0)
                     {
-                        // Create the combined to state
+                        
                         string combinedToStates = CombineStates(letterToStates);
                         
                         // Check if combined to state already exist, if not add to lettertostates and the state stack
