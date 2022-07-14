@@ -15,7 +15,7 @@ namespace AutomatonTest
         public void RenameNull()
         {
             Automaton<string> automaton = null;
-            Assert.AreEqual(null, Automaton<string>.RenameAll(automaton));
+            Assert.AreEqual(null, Automaton<string>.RenameAll(automaton, 'S'));
         }
 
         [Test]
@@ -23,7 +23,7 @@ namespace AutomatonTest
         {
             Automaton<string> automaton = new Automaton<string>();
 
-            Assert.AreEqual(automaton, Automaton<string>.RenameAll(automaton));
+            Assert.AreEqual(automaton, Automaton<string>.RenameAll(automaton, 'S'));
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace AutomatonTest
             dfa.DefineAsStartState("{S0}");
             dfa.DefineAsFinalState("{S5}");
 
-            dfa = Automaton<string>.RenameAll(dfa);
+            dfa = Automaton<string>.RenameAll(dfa, 'S');
 
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S4", 'a', "S4")));
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S4", 'b', "S4")));
@@ -103,7 +103,7 @@ namespace AutomatonTest
             dfa.DefineAsFinalState("{S1,S2,S4,S5}");
             dfa.DefineAsFinalState("{S2,S3,S5}");
 
-            dfa = Automaton<string>.RenameAll(dfa);
+            dfa = Automaton<string>.RenameAll(dfa, 'S');
 
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S3", 'a', "S3")));
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S3", 'b', "S3")));
@@ -142,7 +142,7 @@ namespace AutomatonTest
             dfa.DefineAsStartState("{S0}");
             dfa.DefineAsFinalState("{S2,S3,S5}");
 
-            dfa = Automaton<string>.RenameAll(dfa);
+            dfa = Automaton<string>.RenameAll(dfa, 'S');
 
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S3", 'a', "S3")));
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S3", 'b', "S3")));
@@ -182,7 +182,7 @@ namespace AutomatonTest
             dfa.DefineAsFinalState("{S1,S5}");
             dfa.DefineAsFinalState("{S3,S5}");
 
-            dfa = Automaton<string>.RenameAll(dfa);
+            dfa = Automaton<string>.RenameAll(dfa, 'S');
 
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S3", 'a', "S3")));
             Assert.True(dfa.GetTransitions().Contains(new Transition<string>("S3", 'b', "S3")));

@@ -94,7 +94,7 @@ namespace UIMethods
 
             this.dfa = Conversion.ConvertToDfa(this.nfa);
 
-            this.dfa = Automaton<string>.RenameAll(this.dfa);
+            this.dfa = Automaton<string>.RenameAll(this.dfa, 'S');
 
             this.Log(this.dfa.ToString());
 

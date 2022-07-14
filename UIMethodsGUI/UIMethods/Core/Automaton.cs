@@ -54,11 +54,16 @@ namespace Automaton
             this.symbols = symbols;
         }
 
+        /// <summary>
+        /// Returns a string of the automaton, doesn't include transitions.
+        /// </summary>
+        /// <returns> automaton displayed in a string</returns>
         public override string ToString()
         {
             string s = "({ ";
             // ({ ...all states... }, {...alphabet chars...}, delta, {...start state...}, {...final states...})
 
+            // Adding states
             foreach (T state in this.states)
             {
                 s += state.ToString() + ", ";
@@ -66,6 +71,7 @@ namespace Automaton
             s = s.Remove(s.Length - 2);
             s += " } , { ";
 
+            // Adding alphabet
             foreach (char symbol in this.symbols)
             {
                 s += symbol + ", ";
@@ -76,6 +82,7 @@ namespace Automaton
             s += " } , delta, { ";
 
 
+            // Adding start states
             foreach (T state in this.startStates)
             {
                 s += state.ToString() + ", ";
@@ -83,6 +90,7 @@ namespace Automaton
             s = s.Remove(s.Length - 2);
             s += " } , { ";
 
+            // Adding final states
             foreach (T state in this.finalStates)
             {
                 s += state.ToString() + ", ";
@@ -144,11 +152,9 @@ namespace Automaton
             }
         }
 
-        private static string CreateUuid()
-        {
-            return System.Guid.NewGuid().ToString();
-        }
-
+        /// <summary>
+        /// Sets new SortedSets for start- and finalstates
+        /// </summary>
         public void ResetStartFinalStates()
         {
             this.startStates = new SortedSet<T>();
@@ -191,7 +197,6 @@ namespace Automaton
             Console.WriteLine(this.ToString());
 
         }
-
         public void PrintAlphabet()
         {
             Console.Write("{");
@@ -201,7 +206,6 @@ namespace Automaton
             }
             Console.Write("}");
         }
-
         public void PrintTransitions()
         {
             foreach (Transition<T> t in transitions)
@@ -209,7 +213,6 @@ namespace Automaton
                 Console.WriteLine(t);
             }
         }
-
         public ISet<Transition<T>> GetTransitions()
         {
             return this.transitions;
@@ -339,58 +342,49 @@ namespace Automaton
 
             while (seq.Length > 0)
             {
+                // Get states possible to go to
                 ISet<T> states = GetToStates(currentState, seq[0]);
+
+                // Check if there is a state
                 if (states.Count > 0)
                 {
-                    if (states.Count != 1) throw new Exception("Not a DFA!");
+                    // If multiple states, throw exception: not a DFA, multiple options for one symbol
+                    if (states.Count != 1) throw new Exception("Not a DFA, multiple ways to go to");
                     currentState = states.First();
                 }
-                else return false;
+                else
+                {
+                    throw new Exception("Not a DFA, nowhere to go to");
+                }
 
+                // Moved on to next state, remove first character
                 seq = seq.Substring(1);
             }
 
-            foreach (T final in this.finalStates)
-            {
-                if (final.Equals(currentState)) return true;
-            }
-            return false;
+            // Return if the stranded state is a final state or not
+            return this.finalStates.Contains(currentState);
         }
-
-
-        /// <summary>
-        /// Return transition for this letter
-        /// </summary>
-        /// <param name="lastNode"> Node to connect to </param>
-        /// <returns>Returns a transition for this letter</returns>
-        private static Transition<string> GetLetterTransistion(int lastNode, char character)
-        {
-            string from, to;
-            if (lastNode == 0) from = "S";
-            else from = "S" + (lastNode);
-            ++lastNode;
-            to = "S" + (lastNode);
-            return new Transition<string>(from, character, to);
-        }
-
 
         /// <summary>
         /// return the set of states that can be reached from a given state using an epsilon transition (i.e. no symbol received)
         /// note: this is basically the epsilon closure of the given state
         /// </summary>
         /// <param name="from"> the state to start from </param>
-        /// <returns>the set of destination states (not including the from state)</returns>
+        /// <returns> The set of destination states (not including the from state) </returns>
         public ISet<T> GetToStates(T from)
         {
             // follow all epsilon transitions starting in the from state
             SortedSet<T> states = new SortedSet<T>();
             
+            // Check each transition
             foreach (Transition<T> transition in this.transitions)
             {
+                // If transition has the from state and symbol is epsilon add to states
                 if (transition.GetFromState().Equals(from) && transition.GetSymbol().Equals(Transition<T>.EPSILON))
                 {
                     states.Add(transition.GetToState());
 
+                    // Check epsilon possibilities for everything and add them too (recursion)
                     ISet<T> otherStates = this.GetToStates(transition.GetToState());
 
                     foreach (T otherState in otherStates)
@@ -408,32 +402,38 @@ namespace Automaton
         /// </summary>
         /// <param name="automaton"> automaton to rename the states of </param>
         /// <returns> new automaton with new state names </returns>
-        public static Automaton<string> RenameAll(Automaton<string> automaton)
+        public static Automaton<string> RenameAll(Automaton<string> automaton, char prefix)
         {
             if (automaton == null) return null; // return null, because not created here
             if (automaton.transitions.Count == 0 || automaton.startStates.Count == 0 || automaton.finalStates.Count == 0) return automaton;
 
+            // Create new automaton and set alphabet over from original
             Automaton<string> renamed = new Automaton<string>();
             renamed.SetAlphabet(automaton.GetAlphabet().ToArray());
 
-            StateNamer stateNamer = new StateNamer('S');
+            // Create the statenamer
+            StateNamer stateNamer = new StateNamer(prefix);
 
+            // Create the dictionary and add the start name with the first state name
             Dictionary<string, string> dictionaryRenames = new Dictionary<string, string>();
-
             dictionaryRenames.Add(automaton.GetStartStates().First(), stateNamer.GetNew());
 
+            // Go through each state and if not already renamed, then create new name and add to dictionary
             foreach (string state in automaton.GetAllStates())
             {
                 if (!dictionaryRenames.ContainsKey(state)) dictionaryRenames.Add(state, stateNamer.GetNew());
             }
 
+            // Go through each transition and rename the states
             foreach (Transition<string> transition in automaton.GetTransitions())
             {
                 renamed.AddTransition(new Transition<string>(dictionaryRenames[transition.GetFromState()], transition.GetSymbol(), dictionaryRenames[transition.GetToState()]));
             }
 
+            // Define the start state new name
             renamed.DefineAsStartState(dictionaryRenames[automaton.GetStartStates().First()]);
 
+            // Define the final states new names
             foreach (string finalState in automaton.GetFinalStates())
             {
                 renamed.DefineAsFinalState(dictionaryRenames[finalState]);
@@ -441,63 +441,5 @@ namespace Automaton
 
             return renamed;
         }
-
-        ///// <summary>
-        ///// Return true if a given sequence is accepted by the automata object (even if it is an NDFA)
-        ///// Multiple start states are allowed (and used) and epsilon transitions are used as well
-        ///// THe sequence is accepted if one of the possible transition paths through the automaton
-        ///// ends in one of the final states
-        ///// </summary>
-        ///// <param name="sequence">The sequence to be accepted (or not)</param>
-        ///// <returns>True if the sequence is accepted, false if it is not accepted</returns>
-        //public bool Accept(string sequence)
-        //{
-        //    bool accept = false;
-        //    // Assume multiple start states, try each one in turn
-        //    ...
-        //    return accept;
-        //}
-
-        ///// <summary>
-        ///// Return true if a given sequence is accepted by the automaton (even if it is an NDFA)
-        ///// from the given state, including any epsilon transitions that might occur
-        ///// The sequence is accepted if one of the possible transitions paths through the automaton
-        ///// ends in one of the final states
-        ///// </summary>
-        ///// <param name="from">The state to start the search from</param>
-        ///// <param name="sequence">The sequence to be accepted (or not)</param>
-        ///// <returns>True if the sequence is accepted, false if it is not accepted</returns>
-        //private bool AcceptFromState(T from, string sequence)
-        //{
-        //    bool accepted = false;
-        //    ...
-        //    return accepted;
-        //}
-
-        //// TODO Add functionality to return the epsilon closure --> This is GetToStates(T from)
-        //// TODO Add functionality to return delta epsilon for a given set of state and symbol, based on the epsilon closure --> This is GetToStates(T from, char symbol)
-
-        //// TODO Add functionality for writing an object to a file and for reading an object from a file, using a human readable
-        //// TODO Maybe add a derived class for this, or a decorator class?!
-
-        //// TODO Add functionality for constructing an object that accepts only sequences that start with a given sequence of symbols
-        //// TODO Add functionality for constructing an object that accepts only sequences that end with a given sequence of symbols
-        //// TODO Add functionality for constructing an object that accepts only sequences that contain a given sequence of symbols
-        //// TODO Maybe construct a factory class for this?!
-
-        //// TODO Add functionality for combining two objects into a new object using the AND operator
-        //// TODO Add functionality for combining two objects into a new object using the OR operator
-        //// TODO Add functionality for creating a new object from an existing object using the NOT operator (the complement)
-
-        //// TODO Add functionality to return a sorted set of string containing all words of given length that can be formed using the given symbols
-
-        //// TODO Add functionality for listing all accepted sequences of symbols up to a given length, sorted by length
-
-        //// TODO Add functionality for listing all non-accepted sequences of symbols up to a given length, sorted by length
-
-        //// TODO Add functionality to convert an NDFA into a DFA
-        //// TODO Add functionality to reverse a DFA (resulting in an NDFA)
-        //// TODO Add functionality to minimise a DFA (using either of the two given algorithms)
-        //// TODO Add functionality to perform an equality check on two automata
     }
 }
