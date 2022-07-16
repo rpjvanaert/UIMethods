@@ -1,14 +1,34 @@
 # UIMethods
 
-UIMethods is a project for the course formal methods. The goal was to make a GUI that gives the possibility for the user to type in a regex and to test it using the application. For this to be useful, the regex must be converted into a NFA and eventually DFA. This way the user can easily test what the DFA accepts or not. 
-
+UIMethods is a project for the course formal methods. The goal was to make a GUI that gives the possibility for the user to type in a regex and to test it using the application. For this to be useful, the regex must be converted into a NFA and eventually DFA. This way the user can easily test what the DFA accepts or not. As a side note, the application is made using C# and WPF. The contents of this document are:
 * Usage
 * Theory
 
-Used: C#, WPF
+Any questions or feedback? [Contact me!](mailto:ralf@van-aert.nl)
 
-School project for course Formal Methods.
-User input catches regex. This regex will be converted to NFA and then DFA. The user can then test the DFA as an acceptor.
+## Usage
+
+The layout of the application is rather simple: you have a input box at the top, a bunch of buttons to the left and at the bottom there is another input box and a test button. In the middle of the application is the textblock located for the application to give feedback about the process. <br/>
+First of all, the user types in the regex into the box and clicks on 'Check' to check if it's an accepted regex, see below.
+
+<img src="Screenshot-Layout.png" width="49%" />
+
+<img src="Screenshot-RegexChecker.png" width="49%"/>
+
+After that the user can push postfix to create the postfix, which is shown. When the postfix is created it can be converted to a NFA and lastly a DFA, see both below
+
+<img src="Screenshot-Postfix.png" width="49%" />
+
+<img src="Screenshot-NFA.png" width="49%" />
+
+<img src="Screenshot-DFA.png" />
+
+For further explaination how the conversion works see the theory section. There is one important feature to note here: the trapstate that is created in the conversion to DFA. To create a valid DFA every input may not, in any circumstance, lead to a dead end. Thus this trapstate is created, see state S6 looping back at itself with every symbol.
+<br/>
+Lastly testing the acceptor is done with the input box at the bottom.
+
+<img src="Screenshot-Testing.png"  />
+
 
 ## Theory
 For this project numerous theories are used. It's important to note that the automaton (N)DFA contains everything:
@@ -32,7 +52,7 @@ These make up the automaton, but first you must create an automaton. For this th
 * Acceptor for regex
     * NFA to accept regex in this GUI
 
-This theory will be a short summarary of the code, but will not include everything. For more explanation, check the code with commentary, consult the internet for theory or contact me.
+This theory will be a short summarary of the code, but will not include everything. For more explanation, check the code with commentary, consult the internet for theory or [contact me](mailto:ralf@van-aert.nl).
 <br/>
 <br/>
 
