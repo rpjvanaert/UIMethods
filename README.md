@@ -1,5 +1,10 @@
 # UIMethods
 
+UIMethods is a project for the course formal methods. The goal was to make a GUI that gives the possibility for the user to type in a regex and to test it using the application. For this to be useful, the regex must be converted into a NFA and eventually DFA. This way the user can easily test what the DFA accepts or not. 
+
+* Usage
+* Theory
+
 Used: C#, WPF
 
 School project for course Formal Methods.
@@ -32,12 +37,14 @@ This theory will be a short summarary of the code, but will not include everythi
 <br/>
 
 ## Shunting-Yard algorithm
-The Shunting-Yard algorithm is used to get rid of parenthesis and arange the regex in such a way that the Thompson Construction can iterate over it from front to back. There is only one preparation to be done before the Shunting-Yard algorithm and that is concatenation. <br/>
+The Shunting-Yard algorithm is used to get rid of parenthesis and arange the regex in such a way that the Thompson Construction can iterate over it from front to back. In this case the characters precede the operators. There is only one preparation to be done before the Shunting-Yard algorithm and that is concatenation. <br/>
 Concatenation is normally not shown in a regex. This is because consecutive characters or regex(-parts) are already assumed concatenated if no other operators are applied. For example 'ab' is actually 'a' and 'b' concatenated. For this algorithm '?' is used as concat symbol. The concatenation algorithm won't be discussed, but it works neatly.
-Take 'a(a|b)\*b' for example, in this case the concatenation algorithm creates the concatenated regex: 'a?(a|b)\*?b'. This is done because it glues all the regex parts together.
+Take 'a(a|b)\*b' for example, in this case the concatenation algorithm creates the concatenated regex: 'a?(a|b)\*?b'. This is done because it glues all the regex parts together.<br/>
+How this algorithm works can be found in this flow diagram.
 <br/>
+<img src="shuntingyardalgoritme.jpg" alt="Shunting-Yard Algorithm in a flow diagram"/>
 <br/>
-The Shunting-Yard algorithm creates a [postfix](https://en.wikipedia.org/wiki/Reverse_Polish_notation) where operators follow numbers. Using this the Thompson Construction can be easily executed. To get the postfix, each character of the concatenated regex is iterated over from front to back, see figure below. <br/>
+
 In this flow diagram I want to highlight two parts: the section below the "char is ')' " and "precedence operatorStack top higher or equal to char". The first tackles a closing parenthesis case, which is a finishing regex(-part), thus every operator gets pushed until parenthesis opened is found again in stack. The second part is to handle the precedence of operators. This is very similar as to how precedence in mathematics works with '+', '×' and '^2'. The operators in question with their precedence are:
 
 | Operator | Symbol | Precedence |
@@ -49,9 +56,6 @@ In this flow diagram I want to highlight two parts: the section below the "char 
 
 This rounds up the working of the Shunting-Yard algorithm.
 
-<br/>
-<img src="shuntingyardalgoritme.jpg" alt="Shunting-Yard Algorithm in a flow diagram"/>
-<br/>
 <br/>
 
 ## Thompson construction
